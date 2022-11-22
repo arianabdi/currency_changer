@@ -1,28 +1,29 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { IsNotEmpty, MinLength } from "class-validator";
+import {IsNotEmpty, IsNumber, MinLength} from "class-validator";
 
 export class CreateCurrencyPair {
 
     @ApiProperty({
-        description: 'currency source minimum length 3',
+        description: 'Currency Source',
     })
-    @IsNotEmpty()
     @MinLength(3)
+    @IsNotEmpty()
     from: string;
 
 
     @ApiProperty({
-        description: 'currency destination minimum length 3',
+        description: 'Currency Destination',
     })
-    @IsNotEmpty()
     @MinLength(3)
+    @IsNotEmpty()
     to: string;
 
 
     @ApiProperty({
-        description: 'exchange rate from-to',
+        description: 'rate',
     })
     @IsNotEmpty()
+    @IsNumber()
     rate: number;
 }
 
