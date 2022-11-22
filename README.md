@@ -84,9 +84,9 @@
 یک نمونه از تبدیل ارزها مثلا تبدیل CAD به EUR یک دسته بندی مشابه زیر خواهد داشت. به این ترتیب که ابتدا rate  خود cad با cad محاسبه میشه، سپس با usd و سپسUSD  با EUR
 ```aidl
 [
-  { vertex: 'CAD', rate: 1 },
-  { vertex: 'USD', rate: 0.7462686567164178 },
-  { vertex: 'EUR', rate: 0.86 }
+  { head: 'CAD', rate: 1 },
+  { head: 'USD', rate: 0.7462686567164178 },
+  { head: 'EUR', rate: 0.86 }
 ]
 
 ```
