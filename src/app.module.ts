@@ -19,7 +19,7 @@ import {CurrencyPair} from "./app.entity";
                 port: 5432,
                 username: "dbuser",
                 password: "admin2021",
-                database: "todoapp",
+                database: "pairs",
                 entities: [CurrencyPair],
                 synchronize: true,
             }),

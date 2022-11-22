@@ -1,73 +1,94 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="200" alt="Nest Logo" /></a>
-</p>
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+این پروژه فرآیند پیدا کردن سریع ترین مسیر برای تبدیل ارز ها به هم را با استفاده از الگوریتم Bellman-ford انجام میدهد.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://coveralls.io/github/nestjs/nest?branch=master" target="_blank"><img src="https://coveralls.io/repos/github/nestjs/nest/badge.svg?branch=master#9" alt="Coverage" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
 
-## Description
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+# توضیح تابع convert
 
-## Installation
+ابتدا تمام pair ها را با حذف مقادیر تکراری (با استفاده از distinct) از پایگاه داده، fetch میکنیم
 
-```bash
-$ npm install
+نتیجه کوئری به شکل زیر خواهد بود:
+
+```aidl
+[
+  { currency_from: 'USD', currency_to: 'EUR', currency_rate: 0.86 },
+  { currency_from: 'CAD', currency_to: 'GBP', currency_rate: 0.58 },
+  { currency_from: 'USD', currency_to: 'CAD', currency_rate: 1.34 }
+]
+
+```
+## ایجاد گراف
+
+.سپس اقدام به ایجاد گراف میکنیم، برای اینکار از تابع reduce استفاده میکنیم. این تابع دو ارگومان دارد. مقدار accumulator(نتیجه قبلی) و currentValue (مقدار فعلی).
+به این صورت که به ازای هر ارز، شاخه بندی نسبت به ارزهای دیگر انجام می شود که نتیجه ای مشابه زیر خواهد داشت:
+```aidl
+{
+  USD: [ { to: 'EUR', rate: 0.86 }, { to: 'CAD', rate: 1.34 } ],
+  EUR: [ { to: 'USD', rate: 1.1627906976744187 } ],
+  CAD: [ { to: 'GBP', rate: 0.58 }, { to: 'USD', rate: 0.7462686567164178 } ],
+  GBP: [ { to: 'CAD', rate: 1.7241379310344829 } ]
+}
 ```
 
-## Running the app
+این اقدام به این شکل مرحله به مرحله انجام میشود. فرض کنید در حلقه ای هستیم که pair مامقدار زیر خواهد بود
+```aidl
+{ currency_from: 'USD', currency_to: 'EUR', currency_rate: 0.86 }
+```
+در حلقه اول گراف ما به شکل زیر خواهد شد
+```aidl
+{
+  USD: [ { to: 'EUR', rate: 0.86 } ],
+  EUR: [ { to: 'USD', rate: 1.1627906976744187 } ]
+}
 
-```bash
-# development
-$ npm run start
-
-# watch mode
-$ npm run start:dev
-
-# production mode
-$ npm run start:prod
 ```
 
-## Test
-
-```bash
-# unit tests
-$ npm run test
-
-# e2e tests
-$ npm run test:e2e
-
-# test coverage
-$ npm run test:cov
+حال که حلقه دوم یعنی pair که برابر با مقدار زیر است میرویم
+```aidl
+  { currency_from: 'CAD', currency_to: 'GBP', currency_rate: 0.58 },
 ```
 
-## Support
+حال گراف ما به شکل زیر خواهد شد
+```aidl
+{
+  USD: [ { to: 'EUR', rate: 0.86 } ],
+  EUR: [ { to: 'USD', rate: 1.1627906976744187 } ],
+  CAD: [ { to: 'GBP', rate: 0.58 } ],
+  GBP: [ { to: 'CAD', rate: 1.7241379310344829 } ]
+}
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+```
 
-## Stay in touch
 
-- Author - [Kamil Myśliwiec](https://kamilmysliwiec.com)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+و در آخر به سراغ pair به شکل زیر میرویم که اخرین pair است.
+```aidl
+{ currency_from: 'USD', currency_to: 'CAD', currency_rate: 1.34 }
+```
 
-## License
 
-Nest is [MIT licensed](LICENSE).
+چون قبلا راس usd ایجاد شده بود و فقط شاخه EUR درونش بود، حالا مقدار CADهم به ان اضافه میشود.
+```aidl
+  USD: [ { to: 'EUR', rate: 0.86 }, { to: 'CAD', rate: 1.34 } ],
+  EUR: [ { to: 'USD', rate: 1.1627906976744187 } ],
+  CAD: [ { to: 'GBP', rate: 0.58 }, { to: 'USD', rate: 0.7462686567164178 } ],
+  GBP: [ { to: 'CAD', rate: 1.7241379310344829 } ]
+```
+
+-------------
+
+
+
+## گرفتن شاخه بندی نتایج
+
+
+یک نمونه از تبدیل ارزها مثلا تبدیل CAD به EUR یک دسته بندی مشابه زیر خواهد داشت. به این ترتیب که ابتدا rate  خود cad با cad محاسبه میشه، سپس با usd و سپسUSD  با EUR
+```aidl
+[
+  { vertex: 'CAD', rate: 1 },
+  { vertex: 'USD', rate: 0.7462686567164178 },
+  { vertex: 'EUR', rate: 0.86 }
+]
+
+```
+
+

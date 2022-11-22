@@ -21,7 +21,8 @@ export class CurrencyPair {
     to: string;
 
     @Column({
-        default: 0,
+        type: "float",
+        default: 0.0,
     })
     rate: number;
 }

@@ -9,4 +9,4 @@ services:
     environment:
       - POSTGRES_USER=dbuser
       - POSTGRES_PASSWORD=admin2021
-      - POSTGRES_DB=todoapp
+      - POSTGRES_DB=pairs
