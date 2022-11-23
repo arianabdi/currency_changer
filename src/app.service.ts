@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import {  CreateCurrencyPair, exchangeBodyDto } from './app.dto';
+import {CreateCurrencyPair, DeleteCurrencyPairDto, exchangeBodyDto} from './app.dto';
 import { PathItem, Response } from './app.model';
 import {CurrencyPair} from "./app.entity";
 
@@ -120,5 +120,19 @@ export class AppService {
     }
 
 
+    async deletePair(deleteCurrencyPairDto: DeleteCurrencyPairDto) {
 
+        try {
+            await this.currencyRepository.createQueryBuilder('pair')
+                .delete()
+                .where("id = :id", { id: deleteCurrencyPairDto.id })
+                .execute()
+
+            return { success: true, message: "Pair successfully deleted!" }
+
+        } catch (error) {
+            return { success: false, message: error.message }
+        }
+
+    }
 }

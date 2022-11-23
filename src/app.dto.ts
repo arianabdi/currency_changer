@@ -50,3 +50,11 @@ export class exchangeBodyDto {
     @IsNotEmpty()
     amount: number;
 }
+
+
+export class DeleteCurrencyPairDto {
+    @ApiProperty({description: 'id of currency pair'})
+    @IsNotEmpty()
+    @IsNumber()
+    id: number;
+}
