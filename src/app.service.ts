@@ -12,28 +12,19 @@ export class AppService {
     ) { }
 
 
-    async addPair(createCurrencyPair: CreateCurrencyPair): Promise<Response> {
+    async addPair(createCurrencyPairs: CreateCurrencyPair[]): Promise<Response> {
         try {
-            let pair = await this.currencyRepository.findOne({
-                where: [{ from: createCurrencyPair.from, to: createCurrencyPair.to }, { from: createCurrencyPair.to, to: createCurrencyPair.from }]
-            })
 
 
-            if (!pair) {
-                let newPair = await this.currencyRepository.create(createCurrencyPair);
-                await this.currencyRepository.save(newPair);
-                return { success: true, message: "pair successfully created!" }
-            }
+            // await this.currencyRepository.save(pair);
+            await this.currencyRepository.createQueryBuilder()
+                .insert()
+                .values(createCurrencyPairs)
+                .execute()
 
 
-            else {
-                pair.from = createCurrencyPair.from
-                pair.to = createCurrencyPair.to
-                pair.rate = createCurrencyPair.rate
+            return { success: true, message: "pair successfully updated!" }
 
-                await this.currencyRepository.save(pair);
-                return { success: true, message: "pair successfully updated!" }
-            }
 
         } catch (error) {
             console.log(error.message);
